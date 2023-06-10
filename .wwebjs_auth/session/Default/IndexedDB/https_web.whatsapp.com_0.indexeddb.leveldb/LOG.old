@@ -1,0 +1,16 @@
+2023/06/10-11:37:44.814 1678 Reusing MANIFEST C:\Users\Gustiar Arief Vilana\Videos\video\wa_gateway\whatsapp-api\.wwebjs_auth\session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2023/06/10-11:37:44.815 1678 Recovering log #42
+2023/06/10-11:37:45.720 1678 Reusing old log C:\Users\Gustiar Arief Vilana\Videos\video\wa_gateway\whatsapp-api\.wwebjs_auth\session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/000042.log 
+2023/06/10-11:38:48.878 b34 Compacting 1@1 + 1@2 files
+2023/06/10-11:38:49.171 b34 Generated table #46@1: 14831 keys, 545133 bytes
+2023/06/10-11:38:49.171 b34 Compacted 1@1 + 1@2 files => 545133 bytes
+2023/06/10-11:38:49.174 b34 compacted to: files[ 0 0 1 0 0 0 0 ]
+2023/06/10-11:39:43.699 b34 Level-0 table #48: started
+2023/06/10-11:39:43.864 b34 Level-0 table #48: 1084805 bytes OK
+2023/06/10-11:39:43.865 b34 Delete type=2 #5
+2023/06/10-11:39:43.865 b34 Delete type=0 #42
+2023/06/10-11:39:43.865 b34 Delete type=2 #44
+2023/06/10-11:39:43.952 1678 Compacting 1@1 + 1@2 files
+2023/06/10-11:39:44.385 1678 Generated table #49@1: 20632 keys, 869989 bytes
+2023/06/10-11:39:44.385 1678 Compacted 1@1 + 1@2 files => 869989 bytes
+2023/06/10-11:39:44.387 1678 compacted to: files[ 0 0 1 0 0 0 0 ]
