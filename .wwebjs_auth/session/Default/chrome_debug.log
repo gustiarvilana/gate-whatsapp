@@ -1,6 +1,6 @@
-[0610/205828.829:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Unrecognized feature: 'ambient-light-sensor'.", source:  (0)
-[0610/205828.830:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Unrecognized feature: 'bluetooth'.", source:  (0)
-[0610/205845.991:INFO:CONSOLE(40)] "Uncaught (in promise) TypeError: Failed to execute 'put' on 'Cache': Partial response (status code 206) is unsupported", source: https://web.whatsapp.com/serviceworker.js (40)
-[0610/205846.027:INFO:CONSOLE(40)] "Uncaught (in promise) TypeError: Failed to execute 'put' on 'Cache': Partial response (status code 206) is unsupported", source: https://web.whatsapp.com/serviceworker.js (40)
-[0610/210505.363:ERROR:gpu_process_host.cc(974)] GPU process exited unexpectedly: exit_code=-1073741819
-[0610/210505.363:WARNING:gpu_process_host.cc(1279)] The GPU process has crashed 1 time(s)
+[0612/201945.532:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Unrecognized feature: 'ambient-light-sensor'.", source:  (0)
+[0612/201945.532:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Unrecognized feature: 'bluetooth'.", source:  (0)
+[0612/202007.208:INFO:CONSOLE(40)] "Uncaught (in promise) TypeError: Failed to execute 'put' on 'Cache': Partial response (status code 206) is unsupported", source: https://web.whatsapp.com/serviceworker.js (40)
+[0612/202007.238:INFO:CONSOLE(40)] "Uncaught (in promise) TypeError: Failed to execute 'put' on 'Cache': Partial response (status code 206) is unsupported", source: https://web.whatsapp.com/serviceworker.js (40)
+[0612/202223.545:ERROR:gpu_process_host.cc(974)] GPU process exited unexpectedly: exit_code=-1073741819
+[0612/202223.545:WARNING:gpu_process_host.cc(1279)] The GPU process has crashed 1 time(s)
