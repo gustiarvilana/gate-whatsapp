@@ -1,9 +1,12 @@
-const { Client,LocalAuth,MessageMedia } = require('whatsapp-web.js');
-const qrcode = require('qrcode');
-const express = require('express')
-const socketIO = require('socket.io');
-const http = require('http');
-// const puppeteer = require('puppeteer');
+const { Client, LocalAuth, MessageMedia } = require("whatsapp-web.js");
+const express = require("express");
+const socketIO = require("socket.io");
+const qrcode = require("qrcode");
+const http = require("http");
+const fileUpload = require("express-fileupload");
+const axios = require("axios");
+
+const port = process.env.PORT || 8000;
 
 const app = express();
 const server = http.createServer(app);
@@ -11,118 +14,149 @@ const io = socketIO(server);
 
 // lib.Request
 app.use(express.json());
-app.use(express.urlencoded({extended:true}));
+app.use(express.urlencoded({ extended: true }));
 
+app.use(
+  fileUpload({
+    debug: true,
+  })
+);
+
+app.get("/", (req, res) => {
+  res.sendFile("index.html", { root: __dirname });
+});
 
 // membuat client baru
 const client = new Client({
-    authStrategy:new LocalAuth,
-    puppeteer:{headless:true},
+  restartOnAuthFail: true,
+  authStrategy: new LocalAuth(),
+  puppeteer: {
+    headless: true,
+    args: [
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--disable-dev-shm-usage",
+      "--disable-accelerated-2d-canvas",
+      "--no-first-run",
+      "--no-zygote",
+      "--single-process", // <- this one doesn't works in Windows
+      "--disable-gpu",
+    ],
+  },
 });
-
-app.get('/',(req,res)=>{
-    res.sendFile('index.html',{root:__dirname})
-});
-
-// prosess masuk whatsappjs menggunakan qrcode yang akan dikirim oleh whatsapp-web.js
-
-
-//Proses dimana whatsapp.js siap digunakan
-
 
 // proses algoritma bot
-client.on('message', async message => {
-    if (message.body == '!halo') {
-        message.reply('ada yang bisa saya bantu?');
-    }
-});
-
-client.on('message', async message => {
-    if (message.body == 'otp') {
-        message.reply('kirim otp!');
-    }
+client.on("message", async (message) => {
+  if (message.body == "!halo") {
+    message.reply("ada yang bisa saya bantu?");
+  } else if (message.body == "otp") {
+    message.reply("kirim otp!");
+  }
 });
 
 //proses dimana client disconect dari whatsapp-web
-client.on('disconnected', (reason) => {
-    console.log('disconnectd whatsapp-bot',reason);
+client.on("disconnected", (reason) => {
+  console.log("disconnectd whatsapp-bot", reason);
 });
 
 client.initialize();
 
 // socket.io
-io.on('connection', function(socket){
-    socket.emit('message', 'Connecting API...')
+io.on("connection", function (socket) {
+  socket.emit("message", "Connecting API...");
 
-    client.on('qr', (qr) => {
-        console.log('QRCode RECIVED',qr);
-        qrcode.toDataURL(qr,(err,url)=>{
-            socket.emit('qr',url);
-            socket.emit('message','QR Code revived, Scan please!');
-        })
+  client.on("qr", (qr) => {
+    console.log("QRCode RECIVED", qr);
+    qrcode.toDataURL(qr, (err, url) => {
+      socket.emit("qr", url);
+      socket.emit("message", "QR Code revived, Scan please!");
     });
+  });
 
-    client.on('ready', () => {
-         socket.emit('ready','Whatsapp is Ready!')
-         socket.emit('message','Whatsapp is Ready!')
-    });
+  client.on("ready", () => {
+    socket.emit("ready", "Whatsapp is Ready!");
+    socket.emit("message", "Whatsapp is Ready!");
+  });
+
+  client.on("authenticated", () => {
+    socket.emit("authenticated", "Whatsapp is authenticated!");
+    socket.emit("message", "Whatsapp is authenticated!");
+    console.log("AUTHENTICATED");
+  });
+  client.on("auth_failure", function (session) {
+    socket.emit("message", "Auth failure, restarting...");
+  });
+
+  client.on("disconnected", (reason) => {
+    socket.emit("message", "Whatsapp is disconnected!");
+    client.destroy();
+    client.initialize();
+  });
 });
 
+// cek number wa
+const checkRegisteredNumber = async function (number) {
+  const isRegistered = await client.isRegisteredUser(number);
+  return isRegistered;
+};
+
 // Send Message
-app.post('/send-message', [
-    // body('number').notEmpty(),
-    // body('message').notEmpty(),
-], (req,res)=>{
-    // const errors = validationResult(req).formatWith(({msg})=>{
-    //     return msg;
-    // });
-
-    // if (!errors.isEmpty) {
-    //     return res.status(422).json({
-    //         status:false,
-    //         message:errors.mapped(),
-    //     });
-    // }
-
-    const number = req.body.number;
-    const message = req.body.message;
-
-    client.sendMessage(number,message)
-        .then(response=>{
-            res.status(200).json({
-                status:true,
-                response:response,
-            })
-        })
-        .catch(err=>{
-             res.status(500).json({
-                status:false,
-                response:err,
-            })
-        });
+app.post("/send-message", async (req, res) => {
+  const number = req.body.number;
+  const message = req.body.message;
+  await client
+    .sendMessage(number, message)
+    .then((response) => {
+      res.status(200).json({
+        status: true,
+        response: response,
+      });
+    })
+    .catch((err) => {
+      res.status(500).json({
+        status: false,
+        response: err,
+      });
+    });
 });
 
 // Send Media
-app.post('/send-media', (req,res)=>{
-    const number = req.body.number;
-    const caption = req.body.caption;
-    const media = MessageMedia.fromFilePath('./image/test.jpg');
+app.post("/send-media", async (req, res) => {
+  const number = req.body.number;
+  const caption = req.body.caption;
+  const fileUrl = req.body.file;
 
-    client.sendMessage(number,media,{caption:caption})
-        .then(response=>{
-            res.status(200).json({
-                status:true,
-                response:response,
-            })
-        })
-        .catch(err=>{
-             res.status(500).json({
-                status:false,
-                response:err,
-            })
-        });
+  // const media = MessageMedia.fromFilePath('./image-example.png');
+  // const file = req.files.file;
+  // const media = new MessageMedia(file.mimetype, file.data.toString('base64'), file.name);
+  let mimetype;
+  const attachment = await axios
+    .get(fileUrl, {
+      responseType: "arraybuffer",
+    })
+    .then((response) => {
+      mimetype = response.headers["content-type"];
+      return response.data.toString("base64");
+    });
+
+  const media = new MessageMedia(mimetype, attachment, "Media");
+
+  await client
+    .sendMessage(number, media, { caption: caption })
+    .then((response) => {
+      res.status(200).json({
+        status: true,
+        response: response,
+      });
+    })
+    .catch((err) => {
+      res.status(500).json({
+        status: false,
+        response: err,
+      });
+    });
 });
 
-server.listen(8000, function(){
-    console.log('App running on *: '+ 8000);
+server.listen(port, function () {
+  console.log("App running on *: " + port);
 });
