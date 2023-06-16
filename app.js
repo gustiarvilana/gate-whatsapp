@@ -5,6 +5,7 @@ const qrcode = require("qrcode");
 const http = require("http");
 const fileUpload = require("express-fileupload");
 const axios = require("axios");
+const router = require("router");
 
 const port = process.env.PORT || 8000;
 
@@ -51,6 +52,45 @@ client.on("message", async (message) => {
     message.reply("ada yang bisa saya bantu?");
   } else if (message.body == "otp") {
     message.reply("kirim otp!");
+  } else if (message.body == "asd123") {
+    const contact = await message.getContact();
+    const name = contact.id.user;
+    axios
+      .post("http://192.168.1.77/e-lhp/api/laporan/test", {
+        text: contact.pushname,
+      })
+      .then((response) => {
+        console.log(response.data.data.text);
+        message.reply(name);
+      })
+      .catch((err) => {
+        message.reply("err");
+        res.status(500).json({
+          status: false,
+          response: err,
+        });
+      });
+  } else {
+    const contact = await message.getContact();
+    const name = contact.pushname;
+    const number = contact.number;
+    axios
+      .post("https://elhp.ramarmalia.com/api/laporan/test", {
+        name: name,
+        number: number,
+        message: message.body,
+      })
+      .then((response) => {
+        console.log(response.data.data.text);
+        message.reply(name);
+      })
+      .catch((err) => {
+        message.reply("err");
+        res.status(500).json({
+          status: false,
+          response: err,
+        });
+      });
   }
 });
 
@@ -74,6 +114,7 @@ io.on("connection", function (socket) {
   });
 
   client.on("ready", () => {
+    console.log("Ready!");
     socket.emit("ready", "Whatsapp is Ready!");
     socket.emit("message", "Whatsapp is Ready!");
   });
