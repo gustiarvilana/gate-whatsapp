@@ -56,7 +56,7 @@ client.on("message", async (message) => {
     const contact = await message.getContact();
     const name = contact.id.user;
     axios
-      .post("http://192.168.1.77/e-lhp/api/laporan/test", {
+      .post("https://elhp.ramarmalia.com/api/laporan/test", {
         text: contact.pushname,
       })
       .then((response) => {
@@ -82,7 +82,7 @@ client.on("message", async (message) => {
       })
       .then((response) => {
         console.log(response.data.data.text);
-        message.reply(name);
+        message.reply(response.data.data.text);
       })
       .catch((err) => {
         message.reply("err");
